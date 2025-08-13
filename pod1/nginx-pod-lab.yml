@@ -1,0 +1,35 @@
+apiVersion: v1                    # Versión de la API de Kubernetes para crear este recurso (v1 = recursos básicos como Pod, Service)
+kind: Pod                         # Tipo de recurso que estamos creando (en este caso un Pod)
+metadata:
+  name: pod-lab                   # Nombre único del Pod dentro del namespace
+  labels:                         # Etiquetas que identifican al Pod (pueden ser usadas por Services o Deployments)
+    app: lab                      # Etiqueta "app=lab" para agrupar o seleccionar este Pod
+
+spec:                             # Especificaciones del Pod (definición de contenedores, probes, recursos, etc.)
+  containers:                     # Lista de contenedores que tendrá este Pod
+  - name: lab-container           # Nombre del contenedor (debe ser único dentro del Pod)
+    image: nginx:1.27              # Imagen de Docker que vamos a usar (servidor web Nginx versión 1.27)
+    ports:                         # Lista de puertos expuestos por el contenedor
+    - containerPort: 80            # Puerto interno del contenedor donde escucha Nginx
+
+    resources:                     # Definición de recursos solicitados y límites
+      requests:                    # Recursos mínimos que Kubernetes debe garantizarle a este contenedor
+        memory: "64Mi"             # Memoria mínima solicitada: 64 MB
+        cpu: "250m"                 # CPU mínima solicitada: 250 milicores (0.25 de un núcleo)
+      limits:                      # Recursos máximos que el contenedor puede consumir
+        memory: "128Mi"            # Máximo de memoria permitida: 128 MB
+        cpu: "500m"                 # Máximo de CPU permitido: 0.5 de un núcleo
+
+    livenessProbe:                 # Configuración de la prueba de "vivacidad" (¿el contenedor sigue vivo?)
+      httpGet:                     # Tipo de prueba: petición HTTP GET
+        path: /                     # Ruta del servidor a comprobar (raíz "/")
+        port: 80                    # Puerto donde se hará la petición
+      initialDelaySeconds: 5        # Tiempo de espera antes de la primera comprobación (5 seg después de iniciar)
+      periodSeconds: 5              # Intervalo entre comprobaciones (cada 5 segundos)
+
+    readinessProbe:                 # Configuración de la prueba de "preparación" (¿el contenedor está listo para recibir tráfico?)
+      httpGet:                      # También usamos HTTP GET
+        path: /                      # Ruta a comprobar (misma que arriba)
+        port: 80                     # Puerto donde escucha
+      initialDelaySeconds: 3         # Espera inicial antes de la primera comprobación
+      periodSeconds: 5               # Intervalo entre comprobaciones (cada 5 segundos)

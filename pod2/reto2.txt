@@ -1,0 +1,10 @@
+
+1. Pod con mensaje personalizado
+
+Objetivo: Crear un Pod que use busybox y haga un echo "Hola Kubernetes" cada 5 segundos en bucle.
+Pistas:
+
+    Usa command y args en el YAML.
+
+    Redirige salida a STDOUT para verla con kubectl logs.
+    Dificultad: Fácil.
