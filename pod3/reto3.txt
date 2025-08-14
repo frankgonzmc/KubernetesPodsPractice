@@ -1,0 +1,9 @@
+Pod con livenessProbe fallando y luego funcionando
+
+Objetivo: Crear un Pod que inicie con un livenessProbe HTTP que falle al inicio y luego pase.
+Pistas:
+
+Simula demora usando sleep.
+
+Haz que el endpoint responda solo después de unos segundos.
+Dificultad: Media.
