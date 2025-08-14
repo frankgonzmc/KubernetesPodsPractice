@@ -1,0 +1,9 @@
+Pod con requests y limits estrictos
+
+Objetivo: Crear un Pod que tenga muy poco CPU y memoria asignada para provocar que se limite.
+Pistas:
+
+Usa resources.requests y resources.limits.
+
+Haz que el contenedor consuma más de lo permitido.
+Dificultad: Media.
