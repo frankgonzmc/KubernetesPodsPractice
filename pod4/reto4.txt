@@ -1,0 +1,9 @@
+Pod con readinessProbe tipo TCP
+
+Objetivo: Crear un Pod que se marque listo solo cuando el puerto 8080 esté escuchando.
+Pistas:
+
+Usa readinessProbe con tcpSocket.
+
+Levanta un servicio básico en el contenedor (puede ser python -m http.server 8080).
+Dificultad: Fácil.
