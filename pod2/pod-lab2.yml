@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lab2
+  labels:
+    app: lab
+
+spec:
+  containers:
+  - name: lab2-container
+    image: busybox:1.28
+    command: ["sh", "-c"] #Establecer el ejecutable en sh y pasar el argumento c para indicar que ejecute el siguiente comando
+    args: ["while true; do echo 'Hola Kubernetes'; sleep 5; done"] #Este comando va a STDOUT, se debe ver con comando log/log -f
+
