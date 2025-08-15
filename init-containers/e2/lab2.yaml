@@ -1,0 +1,35 @@
+#EL init container:
+#Hace hasta 5 intentos de ping.
+#Si en todos falla, devuelve exit 1 → el Pod se reinicia.
+#Si tiene éxito, arranca el contenedor principal (Nginx).
+# exit 0 => Exito
+# exit 1 => Falló
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-con-init-espera
+spec:
+  initContainers:
+    - name: esperar-servicio
+      image: busybox
+      command:
+        - sh
+        - -c
+        - |
+          echo "Esperando a servicio-falso..."
+          for i in $(seq 1 5); do
+            if ping -c 1 servicio-falso &>/dev/null; then
+              echo "Servicio disponible!"
+              exit 0
+            fi
+            echo "Intento $i: servicio no disponible, reintentando..."
+            sleep 5
+          done
+          echo "Servicio no respondió, fallo!"
+          exit 1
+  containers:
+    - name: app-principal
+      image: nginx
+      ports:
+        - containerPort: 80

@@ -1,0 +1,77 @@
+#Hola Init:
+#Crea un Pod con 1 Init Container que imprima "Init iniciado" y espere 3 segundos antes de terminar. Luego que arranque un contenedor principal nginx.
+#Secuencia doble:
+#Crea un Pod con 2 Init Containers:
+#El primero imprime "Paso 1 completado".
+#El segundo imprime "Paso 2 completado".
+#Verifica que se ejecuten en orden.
+#Volumen compartido:
+#Haz que un Init Container cree un archivo /data/info.txt con un mensaje, y que el contenedor principal lo lea y lo muestre en logs.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lab3-pod1
+
+spec:
+  initContainers:
+    - name: container-init-pod1
+      image: busybox
+      command: ["sh", "-c"]
+      args: 
+          - |
+            echo "Init iniciando..."
+            sleep 3
+            exit 0
+  containers:
+    - name: container-nginx-pod1
+      image: nginx
+      ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lab3-pod2
+
+spec:
+  # Crear los volumes
+  volumes:
+    - name: shared-data
+      emptyDir: {}
+  initContainers:
+    - name: container-init1-pod2
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+          - |
+            echo "Paso 1 completado"
+            exit 0
+    - name: container-init2-pod2
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+          - |
+            mkdir mi-data
+            echo "Esta es la data" > /mi-data/info.txt
+            echo "Paso 2 completado"
+            exit 0
+      #Montar la data en el volume comartido del pod
+      volumeMounts:
+        - name: shared-data #Volumen definido en volumes
+          mountPath: /mi-data #Directorio de data dentro del init conatiner
+  containers:
+    - name: container-pod2
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+          - |
+            echo "Contenido del archivo compartido: " && \
+            cat /mi-data/info.txt && \
+            echo "Lectura finalizada"
+            while true; do echo "Hola desde BusyBox"; sleep 5; done #Para que el contenedor no termine
+      volumeMounts:
+        - name: shared-data
+          mountPath: /mi-data

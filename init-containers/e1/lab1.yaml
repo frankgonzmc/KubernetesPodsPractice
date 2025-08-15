@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-con-init
+spec:
+  initContainers:
+    - name: init-mensaje #Init container 1 que imprime el mensaje y espera 5 segundos
+      image: busybox
+      command: ['sh', '-c', 'echo "Preparando entorno..."; sleep 5']
+    - name: init-check #Init container 2 que imprime otro mensaje y espera 3 segundos.
+      image: busybox
+      command: ['sh', '-c', 'echo "Verificando recursos..."; sleep 3']
+      #Cuando ambos inits se ejecutan sin errores arranca el contenedor NGINX
+      #Si alguno falla, se reinicia todo el Pod y vuelve a intentar
+  containers:
+    - name: app-principal
+      image: nginx
+      ports:
+        - containerPort: 80
