@@ -1,0 +1,72 @@
+#Validación exitosa:
+# Crea un Init Container que verifique si puede hacer ping a google.com y solo arranque la app principal si tiene éxito.
+#Validación fallida:
+# Haz un Init Container que intente ping a un dominio inexistente (por ejemplo noexiste123.local) y termine con exit 1 para forzar el reinicio del Pod.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lab4-pod1
+
+spec:
+  initContainers:
+    - name: init-container-pod1
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          MAX_INTENTOS=5
+          INTENTO=1
+          while [ $INTENTO -le $MAX_INTENTOS ]; do
+            echo "🔍 Intento $INTENTO de $MAX_INTENTOS..."
+            if ping -c 1 -W 1 google.com > /dev/null 2>&1; then
+                echo "Ping exitoso en intento: $INTENTO"
+                exit 0
+            else
+                echo "Ping fallido en el intento $INTENTO"
+            fi
+            INTENTO=$((INTENTO+1))
+            sleep 2
+          done
+          echo "No se logró conexión después de $MAX_INTENTOS intentos"
+          exit 1
+
+  containers:
+    - name: conatiner-pod1
+      image: nginx
+      ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lab4-pod2
+spec:
+  initContainers:
+    - name: init-container-pod2
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          MAX_INTENTOS=5
+          INTENTO=1
+          while [ $INTENTO -le $MAX_INTENTOS ]; do
+            echo "🔍 Intento $INTENTO de $MAX_INTENTOS..."
+            if ping -c 1 -W 1 noexiste123.local > /dev/null 2>&1; then
+                echo "Ping exitoso en intento: $INTENTO"
+                exit 0
+            else
+                echo "Ping fallido en el intento $INTENTO"
+            fi
+            INTENTO=$((INTENTO+1))
+            sleep 2
+          done
+          echo "No se logró conexión después de $MAX_INTENTOS intentos"
+          exit 1
+  containers:
+    - name: container-pod2
+      image: nginx
+      ports:
+        - containerPort: 80
