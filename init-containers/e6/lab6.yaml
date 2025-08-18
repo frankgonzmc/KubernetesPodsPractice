@@ -1,0 +1,38 @@
+# Simula que un Init Container ejecuta una “migración” escribiendo "Migración completada" 
+# -en un archivo de un volumen compartido antes de que la app arranque.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  volumes:
+    - name: volumes
+      emptyDir: {}
+  initContainers:
+    - name: init-container
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          for i in $(seq 1 10); do
+            echo "Aplicando migracion $i" >> /data/info.txt
+            sleep 1
+          done
+          exit 0
+      volumeMounts:
+        - name: volumes
+          mountPath: /data
+  containers:
+    - name: container
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          echo "Mostrar contenido: " && \
+          cat /data/info.txt
+          while true; do echo "Hola desde BusyBox"; sleep 5; done #Para que el contenedor no termine
+      volumeMounts:
+        - name: volumes
+          mountPath: /data 
