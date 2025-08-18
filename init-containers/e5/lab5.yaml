@@ -1,0 +1,61 @@
+#Esperando un servicio interno:
+# Crea un Pod db-falsa que tarde 15 segundos en arrancar (puedes usar sleep), 
+# y un Pod con Init Container que no arranque su contenedor principal hasta que la db-falsa responda a ping.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+  labels: # Labels para seleccionar con un Service por app: db
+    app: db
+
+spec:
+  containers:
+    - name: db-false
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          echo "Simulando base de datos tardando 20 segundos...";
+          sleep 20;
+          echo "Base de datos lista, escuchando en puerto 80...";
+          nc -lk -p 80
+---
+# Usaremos un service que seleccione al pod de bd
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-servicio
+
+spec:
+  selector:
+    app: db  # Llamar al pod que contiene el db
+  ports: # Apuntamos al puerto 80 de ese pod
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod2
+
+spec:
+  initContainers:
+    - name: init-container-pod2
+      image: busybox
+      command: ["sh", "-c"]
+      args: 
+        - |
+          echo "Esperando a pod1 (my-servicio)...";
+          until nc -z my-servicio 80; do
+            echo "Aun no responde, reintentando...";
+            sleep 5;
+          done
+          echo "Base de datos disponible, continuando...";
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
