@@ -1,0 +1,33 @@
+#Haz que un Init Container descargue un archivo (por ejemplo con wget desde una URL pública) 
+# y lo deje listo para que el contenedor principal lo use.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  volumes:
+    - name: data
+      emptyDir: {}
+  initContainers:
+    - name: init-container
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          if wget -O /data/index.html "pagina a descargar"; then
+            echo "Descarga exitosa"
+            exit 0
+          else
+            echo "Error en la descarga"
+            exit 1
+          fi
+  containers:
+    - name: container
+      image: busybox
+      command: ["sh", "-c"]
+      args: 
+        - |
+          cat /data/index.html
+          while true; do echo "Hola desde BusyBox"; sleep 5; done #Para que el contenedor no termine
