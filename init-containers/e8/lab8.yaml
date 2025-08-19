@@ -1,0 +1,54 @@
+#Cadena de preparación:
+#Construye un Pod con 3 Init Containers en secuencia:
+# 1°: Validar red.
+# 2°: Validar base de datos (falsa).
+# 3°: Crear un archivo de configuración.
+# El contenedor principal solo debe arrancar si los tres pasan.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  initContainers:
+    - name: init1
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          if ping -c 3 google.com; then
+            echo "Red validada exitosa"
+            exit 0
+          else
+            echo "Error en la red"
+            exit 1
+          fi
+    - name: init2
+      image: busybox
+      command: ["sh", "-c"]
+      args: # BD falsa sera un servicio de googgle
+        - |
+          if ping -c 3 google.com; then
+            echo "Base de datos validada exitosa"
+            exit 0
+          else
+            echo "Error en la BD"
+            exit 1
+          fi
+
+    - name: init3
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          mkdir data
+          cd data
+          echo "id=124213" > env.conf
+          cat env.conf
+  containers:
+    - name: container
+      image: nginx
+      ports:
+        - containerPort: 80
+        
