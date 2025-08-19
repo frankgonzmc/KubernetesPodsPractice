@@ -1,0 +1,30 @@
+#Misma IP ⇒ el sidecar consulta a la app por localhost:80.
+#El sidecar no impone orden de arranque entre contenedores normales, por eso espera hasta que la app responda.
+#Cuando la app ya no responde, el sidecar termina (evitas que el Pod se quede vivo “solo por el sidecar”).
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-sidecar-vigilante
+spec:
+  containers:
+    - name: app
+      image: nginxdemos/hello
+      ports:
+        - containerPort: 80
+    - name: watcher
+      image: busybox:1.36
+      command: ["sh", "-c"]
+      args:
+        - |
+          echo "Esperando a que la app responda en http://127.0.0.1:80 ..."
+          until wget -q -O- http://127.0.0.1:80 >/dev/null 2>&1; do
+            sleep 1
+          done
+          echo "App lista; comenzando vigilancia."
+          while wget -q -O- http://127.0.0.1:80 >/dev/null 2>&1; do
+            echo "$(date) OK"
+            sleep 5
+          done
+          echo "La app dejó de responder; cierro el sidecar."
+          exit 0
