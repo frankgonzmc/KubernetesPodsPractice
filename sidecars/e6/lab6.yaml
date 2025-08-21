@@ -1,0 +1,30 @@
+#Sidecar terminador:
+#   Haz un sidecar que se quede vigilando al contenedor principal (wget localhost:80).
+#   Cuando el principal deje de responder, el sidecar debe terminar con exit 0 para que el Pod no quede vivo solo por el sidecar.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  containers:
+    - name: app
+      image: nginx
+      ports:
+        - containerPort: 80
+
+    - name: watcher
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            if wget -q --spider http://localhost:80; then
+              echo "App OK"
+            else
+              echo "App Down, Apagando sidecar"
+              exit 0
+            fi
+            sleep 5
+          done
