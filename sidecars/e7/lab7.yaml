@@ -1,0 +1,42 @@
+# Sidecar compresor
+# El contenedor principal escribe texto en /data/events.log.
+# El sidecar debe comprimirlo continuamente (gzip -c /data/events.log > /data/events.log.gz).
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  volumes:
+    - name: volume
+      emptyDir: {}
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          for i in $(seq 1 50); do
+            echo "Log número $i" >> /data/events.log
+            sleep 1
+          done
+          while true; do echo "App sigue viva" >> /var/log/app.log; sleep 5; done
+      volumeMounts:
+        - name: volume
+          mountPath: /data
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            if [ -f /data/events.log ]; then
+              gzip -c /data/events.log > /data/events.log.gz
+              echo "Archivo comprimido en /data/events.log.gz"
+            fi
+            sleep 5
+          done
+      volumeMounts:
+        - name: volume
+          mountPath: /data
