@@ -1,0 +1,37 @@
+#La app y el sidecar comparten archivos del Pod (la app escribe y el sidecar lee).
+#El sidecar corre en paralelo mientras la app está activa.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-sidecar-logs
+spec:
+  volumes:
+    - name: logs
+      emptyDir: {}
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c"]
+      args: |
+        i=0
+        mkdir -p /var/log/app
+        while true; do
+          echo "$(date) evento $i" >> /var/log/app/app.log
+          i=$((i+1))
+          sleep 2
+        done
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log/app
+
+    - name: log-forwarder
+      image: busybox:1.36
+      command: ["sh", "-c"]
+      args: |
+        touch /shared/app.log
+        echo "Sidecar: enviando logs a stdout..."
+        tail -F /shared/app.log
+      volumeMounts:
+        - name: logs
+          mountPath: /shared
