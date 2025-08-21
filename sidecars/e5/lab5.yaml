@@ -1,0 +1,40 @@
+#Sidecar duplicador de logs:
+#   El contenedor principal genera logs en /var/log/app.log.
+#   Haz un sidecar que lea ese archivo y lo duplique a otro /shared/app-copy.log (mismo volumen compartido).
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-duplicator
+spec:
+  volumes:
+    - name: logs
+      emptyDir: {}
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          for i in $(seq 1 10); do
+            echo "Log número $i" >> /var/log/app.log
+            sleep 1
+          done
+          while true; do echo "App sigue viva" >> /var/log/app.log; sleep 5; done
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log
+
+    - name: duplicador
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          mkdir -p /shared
+          touch /shared/app-copy.log
+          tail -F /var/log/app.log >> /shared/app-copy.log
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log
+        - name: logs
+          mountPath: /shared
