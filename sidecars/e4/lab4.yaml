@@ -1,0 +1,37 @@
+#Sidecar contador:
+#   Un contenedor “app” escribe números crecientes en un archivo /data/numbers.txt.
+#   Tu sidecar debe hacer tail -f de ese archivo y mostrarlos por stdout.
+#   Pista: usa un volumen compartido emptyDir.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  volumes:
+    - name: volume
+      emptyDir: {}
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          for i in $(seq 1 100); do
+            echo "N° $i" >> data/numbers.txt
+            sleep 1
+          done
+          while true; do echo "Trabajo terminado"; sleep 5; done
+      volumeMounts:
+        - name: volume
+          mountPath: /data
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          tail -f /data/numbers.txt
+      volumeMounts:
+        - name: volume
+          mountPath: /data
