@@ -1,0 +1,29 @@
+#Sidecar vigilante:
+# Crea un Pod con Nginx en :80 y un sidecar BusyBox que haga wget http://localhost:80 
+# cada 5 segundos. El sidecar debe imprimir “App OK” si responde, o “App Down” si no.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - containerPort: 80
+    
+    - name: watcher
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            if wget -q --spider http://localhost:80; then
+              echo "App OK"
+            else
+              echo "App Down"
+            fi
+            sleep 5
+          done
