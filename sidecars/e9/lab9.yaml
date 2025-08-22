@@ -1,0 +1,36 @@
+#Sidecar generador de HTML
+# El contenedor principal es Nginx (:80).
+# Tu sidecar debe crear un archivo index.html dentro de un volumen compartido.
+# Nginx debe servir ese archivo como página principal.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  volumes:
+    - name: volumen
+      emptyDir: {}
+
+  containers:
+    - name: app
+      image: nginx
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: volumen
+          # Montar el volumen en el path donde nginx sirve sus archivos html
+          mountPath: /usr/share/nginx/html
+
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          echo "<h1>Hola mundo</h1>" >> /data/index.html
+          while true; do echo "App sigue viva" >> /var/log/app.log; sleep 5; done
+      volumeMounts:
+        - name: volumen
+          #Montar el volumen en dat que es creado por k8s
+          mountPath: /data
