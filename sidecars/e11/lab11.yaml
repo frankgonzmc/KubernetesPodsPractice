@@ -1,0 +1,41 @@
+#Sidecar reloj sincronizado:
+#   Un contenedor “app” imprime su hora cada 3 segundos.
+#   El sidecar imprime la suya cada 3 segundos también, pero en el mismo archivo /data/timestamps.log.
+#   La idea es ver cómo dos contenedores escriben en el mismo volumen compartido.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+
+spec:
+  volumes:
+    - name: volume
+      emptyDir: {}
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            echo "echo desde app ${date}" >> /data/timestamps.log
+            cat /data/timestamps.log
+            sleep 3
+          done
+      volumeMounts:
+        - name: volume
+          mountPath: /data
+
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            echo "echo desde sidecar ${date}" >> /data/timestamps.log
+            sleep 3
+          done
+      volumeMounts:
+        - name: volume
+          mountPath: /data
