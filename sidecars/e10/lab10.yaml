@@ -1,0 +1,33 @@
+# Sidecar auditor
+# Un contenedor principal expone :80.
+# Haz que el sidecar cada 10 segundos guarde en un archivo audit.txt la 
+# respuesta HTTP de la app (wget -q -O- localhost:80 >> /data/audit.txt).
+
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: pod
+
+spec:
+  containers:
+    - name: app
+      image: nginx
+      ports:
+        - containerPort: 80
+
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            if wget -q -O- http://localhost:80; then
+              echo "App OK ${date}" >> audit.txt
+              cat audit.txt
+            else
+              echo "App Down"
+              exit 0
+            fi
+            sleep 10
+          done
