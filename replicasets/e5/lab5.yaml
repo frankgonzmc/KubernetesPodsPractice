@@ -1,0 +1,26 @@
+#Cambio en los labels del Pod: 
+#   Crea un ReplicaSet de 3 Pods con app=web.
+#   Usa kubectl edit pod <nombre> para cambiar el label de un Pod a app=db.
+#   Verifica que:
+#   Ese Pod queda “huérfano”.
+#   El ReplicaSet crea otro nuevo Pod con app=web para mantener las 3 réplicas.
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mi-replica
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
