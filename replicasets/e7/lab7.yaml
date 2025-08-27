@@ -1,0 +1,27 @@
+#ReplicaSet multi-app conflictivo:
+#   Crea un ReplicaSet con selector: app=miweb.
+#   En el template pon labels: app=otraweb.
+#   Observa que el ReplicaSet no controla sus propios Pods.
+#   Corrige el error para que funcione.
+
+
+#En ultimas versiones de kubernetes, no te permitirá aplicar una configiracion errada
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mi-replica
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: miweb
+  template:
+    metadata:
+      labels:
+        app: otraweb
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
