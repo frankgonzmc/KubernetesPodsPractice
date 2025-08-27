@@ -1,0 +1,24 @@
+#Rollback:
+# Haz un cambio erróneo en la imagen (por ejemplo nginx:fake).
+# Observa cómo fallan los Pods.
+# Usa kubectl rollout undo deployment nombre-deployment para volver a la versión anterior.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mi-replica
+  template:
+    metadata:
+      labels:
+        app: mi-replica
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
