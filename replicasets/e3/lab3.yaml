@@ -1,0 +1,24 @@
+#Cambio de número de réplicas:
+# Escala el ReplicaSet de 2 a 5 réplicas modificando el YAML.
+# Luego redúcelo de nuevo a 2.
+# Comprueba que Kubernetes elimina los Pods sobrantes.
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mi-replica
+spec:
+  replicas: 2  # Cambiar a 5 y luego a 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
