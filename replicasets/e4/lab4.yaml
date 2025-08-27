@@ -1,0 +1,40 @@
+# Probar el selector y labels:
+#   Crea un ReplicaSet con app=nginx.
+#   Luego crea un Pod manual con la misma etiqueta app=nginx.
+#   Verifica que el ReplicaSet lo adopta.
+#   Borra el Pod manual y confirma que el ReplicaSet crea uno nuevo.
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mi-replica
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: container
+          image: nginx
+          ports:
+            - containerPort: 80
+
+#Este pod sera adoptado pero morira porque el replicaset solo tiene comi maximo 4 pods
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mi-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+    - name: container-pod
+      image: nginx
+      ports:
+        - containerPort: 80
