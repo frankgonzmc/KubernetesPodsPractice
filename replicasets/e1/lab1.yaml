@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mi-replicaset
+spec:
+  replicas: 3   # Número de pods deseados
+  selector:
+    matchLabels:
+      app: nginx   # Este replicaset debe vigilar os pods con la etiqueta app:nginx
+  template:   # Plantilla para crear pods
+    metadata:
+      labels:
+        app: nginx # Quiero 3 Pods que tengan la etiqueta app=nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
