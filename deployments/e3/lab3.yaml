@@ -1,0 +1,23 @@
+#Escalado manual:
+#   Aumenta el número de réplicas de 3 a 6 en el mismo Deployment.
+#   Verifica con kubectl get pods que se escalen.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
