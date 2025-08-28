@@ -1,0 +1,27 @@
+#Agregar labels personalizados:
+#   Añade labels como tier=frontend, env=dev.
+#   Verifica con kubectl get pods --show-labels.
+#   Intenta listar solo los Pods con kubectl get pods -l tier=frontend.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-deployment
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+      env: dev
+  template:
+    metadata:
+      labels:
+        tier: frontend
+        env: dev
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
