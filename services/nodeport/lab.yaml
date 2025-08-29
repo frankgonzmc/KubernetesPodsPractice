@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30080   # Puerto expuesto en los nodos
+  type: NodePort
+
+#Cliente externo → http://<NodeIP>:30080
+#          ↓
+#(NodePort en el nodo)
+#          ↓
+#ClusterIP (puerto 80, VIP interno)
+#          ↓
+#Pods (targetPort: 8080, donde escucha Nginx)

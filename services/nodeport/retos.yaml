@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport-1
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport-2
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 8080
+      targetPort: 80
+      nodePort: 30081
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport-3
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 8888
+      targetPort: 80
+      nodePort: 30082
+  type: NodePort
+
+
+#Acceder a los node port:
+  # 1) minikube ip
+  # 2) culr http://ip:port
+  # Los ports asignados en este lab son: 30080, 30081, 30082
