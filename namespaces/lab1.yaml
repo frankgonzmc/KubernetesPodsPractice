@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: dev   # Este va al espacio de dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: prod   # Este va al espacio de prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable
