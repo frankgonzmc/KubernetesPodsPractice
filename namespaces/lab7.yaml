@@ -1,0 +1,17 @@
+#Limitar recursos con ResourceQuota:
+# Reto: En team-a, crea un ResourceQuota que limite:
+#       Máximo 5 Pods
+#       Máximo 1 CPU en requests
+#       Máximo 2 GiB en requests de memoria
+#Pista: Usa kind: ResourceQuota con la clave hard.
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: quota-team-a
+  namespace: team-a
+spec:
+  hard:
+    pods: "5"              # Máximo 5 Pods en este namespace
+    requests.cpu: "1"      # Máximo 1 CPU en requests (suma de todos los Pods)
+    requests.memory: "2Gi" # Máximo 2 GiB en requests de memoria (suma total)
