@@ -1,0 +1,31 @@
+#Desplegar un Deployment en un Namespace:
+#   Reto: Crea un Deployment llamado nginx-web en el Namespace team-a con 2 réplicas de nginx:latest.
+#   Pista: Recuerda incluir namespace: team-a en el metadata.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-deployment
+  namespace: team-a
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+          ports:
+            - containerPort: 80
