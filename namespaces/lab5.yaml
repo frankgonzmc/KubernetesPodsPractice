@@ -1,0 +1,45 @@
+#Crear un Service en el mismo Namespace:
+#   Reto: Expón el Deployment nginx-web con un Service ClusterIP dentro del mismo Namespace team-a.
+#   Pista: Debe apuntar al label app: nginx-web.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      conatiners:
+        - name: container
+          image: nginx
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-servicio
+spec:
+  selector:
+    app: web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
