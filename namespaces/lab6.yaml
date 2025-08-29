@@ -1,0 +1,62 @@
+#Probar comunicación entre Namespaces
+# Reto:
+#   Crea otro Namespace team-b.
+#   Lanza un Pod con la imagen busybox
+#   Desde ese Pod, accede al Service de team-a usando el DNS completo.
+# Pista:
+#   curl
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-b
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-team-a
+  namespace: team-a
+  labels:
+    app: web
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-team-a
+  namespace: team-a
+spec:
+  selector:
+    app: web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-team-b
+  namespace: team-b
+spec:
+  containers:
+    - name: busy
+      image: curlimages/curl:8.6.0 # Imagen con curl preinstalado
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            echo "Probando conexión al Service team-a...";
+            curl -s svc-team-a.team-a.svc.cluster.local;
+            sleep 10;
+          done
