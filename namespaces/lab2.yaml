@@ -1,0 +1,22 @@
+#COn REsourceQuota, definir capacidades de cpu, memoria, etc
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+
+---
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "10"          # máximo 10 Pods
+    requests.cpu: "2"   # máximo 2 CPUs solicitadas
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
