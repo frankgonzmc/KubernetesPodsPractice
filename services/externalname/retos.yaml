@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: externalname-1
+spec:
+  type: ExternalName
+  externalName: www.google.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: externalname-2
+spec:
+  type: ExternalName
+  externalName: www.wikipedia.org
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: externalname-3
+spec:
+  type: ExternalName
+  externalName: www.openai.com
+
+
+#kubectl exec -it deploy/nginx-deploy -- curl http://externalname-1
+#kubectl exec -it deploy/nginx-deploy -- curl http://externalname-2
+#kubectl exec -it deploy/nginx-deploy -- curl http://externalname-3
