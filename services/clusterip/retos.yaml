@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-clusterip-1
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-clusterip-2
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 8080
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-clusterip-3
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 8888
+      targetPort: 80
+  type: ClusterIP
+
+
+#1) HAcer un apply
+#2/ Probar por service: kubectl exec -it deploy/nginx-deploy -- curl http://nginx-clusterip-1   => por defecto en 80,
+#   pero para los otros usar el puerto asignado (8080,8888)

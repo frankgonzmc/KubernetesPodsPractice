@@ -1,0 +1,15 @@
+###EJEMPLO###
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80        # Puerto expuesto por el Service (VIP)
+      targetPort: 8080 # Puerto del contenedor (Pod)
+  type: ClusterIP
+
+#Importante: Desde fuera del clúster NO es accesible directamente.
